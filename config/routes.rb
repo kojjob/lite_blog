@@ -1,30 +1,23 @@
 Rails.application.routes.draw do
-  get "follows/create"
-  get "follows/destroy"
-  get "dashboard/index"
-  get "categories/index"
-  get "categories/show"
-  get "comments/create"
-  get "comments/destroy"
-  get "posts/index"
-  get "posts/show"
-  get "posts/new"
-  get "posts/create"
-  get "posts/edit"
-  get "posts/update"
-  get "posts/destroy"
-  get "home/index"
-  devise_for :users
-  # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
+  root "home#index"
 
-  # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
-  # Can be used by load balancers and uptime monitors to verify that the app is live.
+
+  devise_for :users
+
+  resources :posts do
+    resources :comments, only: [ :create, :destroy ]
+  end
+
+  resources :categories, only: [ :index, :show ]
+
+  get "dashboard", to: "dashboard#index"
+
+  post "follow/:id", to: "follow#create", as: "follow"
+  post "unfollow/:id", to: "follow#destroy", as: "unfollow"
+
   get "up" => "rails/health#show", as: :rails_health_check
 
   # Render dynamic PWA files from app/views/pwa/*
   get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
   get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
-
-  # Defines the root path route ("/")
-  # root "posts#index"
 end
